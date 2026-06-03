@@ -2,8 +2,7 @@ import { useState } from "react";
 
 export default function Login({ onLogin, hasBackend }) {
   const [mode, setMode] = useState("student"); // student | admin
-  const [name, setName] = useState("");
-  const [matric, setMatric] = useState("");
+  const [username, setUsername] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -11,8 +10,8 @@ export default function Login({ onLogin, hasBackend }) {
   async function submit() {
     setError("");
     if (mode === "student") {
-      if (!name.trim() || !matric.trim()) {
-        setError("Please enter both your name and matric number.");
+      if (!username.trim()) {
+        setError("Please enter a username.");
         return;
       }
     } else if (!code.trim()) {
@@ -20,7 +19,9 @@ export default function Login({ onLogin, hasBackend }) {
       return;
     }
     setBusy(true);
-    const res = await onLogin(mode === "student" ? { name, matric } : { code });
+    const res = await onLogin(
+      mode === "student" ? { name: username, matric: username } : { code }
+    );
     setBusy(false);
     if (!res.ok) setError(res.error);
   }
@@ -31,11 +32,8 @@ export default function Login({ onLogin, hasBackend }) {
         <div className="center">
           <div style={{ fontSize: 40, marginBottom: 8 }}>⚖️</div>
           <h1 style={{ fontSize: "2.1rem" }}>
-            Iye's <span style={{ color: "var(--gold)", fontStyle: "italic" }}>Law</span> Study
+            Nigerian Law School <span style={{ color: "var(--gold)", fontStyle: "italic" }}>MCQ</span> Quiz
           </h1>
-          <p className="soft mt" style={{ maxWidth: 380, margin: "10px auto 0" }}>
-            Nigerian Law School · Bar Part II · Abuja 2026. Lessons and quizzes for all five courses — built for Iye and her classmates.
-          </p>
         </div>
 
         <div className="card mt2 rise d1">
@@ -58,22 +56,30 @@ export default function Login({ onLogin, hasBackend }) {
 
           {mode === "student" ? (
             <>
-              <div className="field mb">
-                <label>Your name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Iye Okoro" autoComplete="name" />
-              </div>
               <div className="field">
-                <label>Matric / Exam number</label>
-                <input value={matric} onChange={(e) => setMatric(e.target.value)} placeholder="e.g. NLS/AB/2026/0123" autoComplete="off" />
+                <label>Username</label>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="e.g. iye_okoro"
+                  autoComplete="off"
+                  onKeyDown={(e) => e.key === "Enter" && submit()}
+                />
               </div>
               <p className="muted mt" style={{ fontSize: "0.8rem" }}>
-                Your matric number keeps your progress and streak. Use the same one each time to log back in.
+                Your username keeps your progress and streak. Use the same one each time to log back in.
               </p>
             </>
           ) : (
             <div className="field">
               <label>Admin code</label>
-              <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter admin code" type="password" />
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Enter admin code"
+                type="password"
+                onKeyDown={(e) => e.key === "Enter" && submit()}
+              />
               <p className="muted mt" style={{ fontSize: "0.8rem" }}>
                 For monitoring all students' progress, streaks and scores.
               </p>
